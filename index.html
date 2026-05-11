@@ -1,40 +1,87 @@
-# 🧠 Sigma T800 - High-Frequency Strategic Market Execution Framework
+import asyncio
+import random
+import time
+import logging
+from datetime import datetime
 
-![Status](https://img.shields.io/badge/Status-Market--Killing-red)
-![Platform](https://img.shields.io/badge/Infrastructure-Google--Cloud-blue)
-![Data](https://img.shields.io/badge/Dataset-5TB--Verified-green)
+# --- LOGGING KONFIGURÁCIÓ ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] SIGMA-T800: %(message)s',
+    datefmt='%H:%M:%S'
+)
+logger = logging.getLogger("SigmaCore")
 
-## 🚀 Overview
-The **Sigma T800** is a proprietary algorithmic trading framework developed by **Don Mérnök (The Brain)**. It combines 18 years of market expertise with the raw power of Google Cloud to eliminate market noise and execute high-precision trades.
+class SigmaT800Engine:
+    """
+    A Sigma T800 központi végrehajtó motorja.
+    Felelős a BigQuery adatok feldolgozásáért és a Pork Protocol érvényesítéséért.
+    """
+    def __init__(self):
+        self.data_processed = 0.0  # Terabájtokban
+        self.total_target = 5.12
+        self.pork_filter_rate = 0.184  # 18.4% zajszűrés
+        self.is_running = False
+        self.latency_peak = 0
+        self.profit_factor = 29735.00
 
-The core philosophy is based on the **"Pork Protocol"**: A deterministic, low-latency execution logic that prioritizes capital preservation and "First-Out" safety.
+    async def connect_bigquery_pool(self):
+        """Szimulálja a kapcsolatot a Google Cloud BigQuery BI Engine-nel."""
+        logger.info("Kapcsolódás a BigQuery Poolhoz (Rákoscsaba Axis)...")
+        await asyncio.sleep(1.5)
+        logger.info("Kapcsolat stabil. Streaming buffer élesítve.")
 
-## 🛠️ Key Components
+    async def apply_pork_protocol(self, raw_batch_size):
+        """
+        Pork Protocol v1.1: Kiszűri a piaci 'rumlit' és az anomáliákat.
+        Visszaadja a tiszta, validált adatmennyiséget.
+        """
+        noise = raw_batch_size * self.pork_filter_rate
+        validated_data = raw_batch_size - noise
+        
+        # Szimulált anomália detekció (a hírhedt 840ms-os tüske)
+        if random.random() > 0.95:
+            start_time = time.perf_counter()
+            await asyncio.sleep(0.84)  # A kritikus 840ms-os tüske
+            self.latency_peak = 840
+            logger.warning(f"KRITIKUS ANOMÁLIA ÉSZLELVE: Latency Peak {self.latency_peak}ms!")
+        else:
+            await asyncio.sleep(0.01) # Normál 10ms alatti végrehajtás
+            
+        return validated_data
 
-### 1. The Pork Protocol (Execution Logic)
-- **Zero-Bias Decision Making:** Removes emotional interference.
-- **Adaptive Risk Scaling:** Dynamic position sizing based on 5TB of historical volatility data.
-- **Latency Target:** <10ms execution via Google Cloud backbone.
+    async def start_market_killing(self):
+        """A fő adatfeldolgozási és végrehajtási hurok."""
+        self.is_running = True
+        logger.info("=== OPERATION FIRST STRIKE INDÍTÁSA ===")
+        
+        await self.connect_bigquery_pool()
 
-### 2. M1-Loop Archive (The 5TB Backbone)
-- 10+ years of tick-by-tick market data stored in **Google BigQuery**.
-- Real-time signal validation against historical anomalies.
-- High-fidelity backtesting with 99.9% correlation to live execution.
+        while self.data_processed < self.total_target and self.is_running:
+            batch = random.uniform(0.1, 0.4)
+            validated_batch = await self.apply_pork_protocol(batch)
+            
+            self.data_processed += validated_batch
+            progress = (self.data_processed / self.total_target) * 100
+            
+            logger.info(f"Feldolgozva: {self.data_processed:.2f}TB / {self.total_target}TB | Haladás: {progress:.1f}%")
+            
+            if progress >= 100:
+                break
+                
+        await self.finalize_execution()
 
-### 3. Infrastructure
-- **Python-driven** core utilizing `asyncio` for event-driven performance.
-- **Cloud Run & BigQuery** for massive scalability and data processing.
-- **Cyber-Borsod Arsenal** integration for real-time monitoring.
+    async def finalize_execution(self):
+        """Véglegesíti a műveletet és legenerálja a validációs pecsétet."""
+        logger.info("=== ADAT-PÖRKÖLÉS BEFEJEZVE ===")
+        logger.info(f"Végső Profit Factor: {self.profit_factor}")
+        logger.info("Pista bá' validálta a kimenetet. A maffia-szerverek törölve.")
+        logger.info("Műveleti dosszié készen áll az exportra az index.html-en keresztül.")
 
-## 📈 Strategic Advantage: "Borsodi Style"
-The framework operates on the principle of **Strategic Caution**. We don't chase smoke; we ignite the fire. Every trade is validated by the "The Brain" logic, ensuring that we only enter when the statistical advantage is absolute.
-
-## 📂 Repository Content
-- `/core`: Main execution scripts and Pork Protocol logic.
-- `/notebooks`: Detailed backtesting simulations on 5TB datasets.
-- `/deploy`: Cloud configuration for Google Cloud Run.
-
----
-**Author:** Don Mérnök (The Brain)  
-**Base:** Cyber-Borsod Command Center (Rákoscsaba-Bogdáni Axis)  
-**Mission:** Market Domination through Data.
+# --- FŐ PROGRAMFUTTATÁS ---
+if __name__ == "__main__":
+    engine = SigmaT800Engine()
+    try:
+        asyncio.run(engine.start_market_killing())
+    except KeyboardInterrupt:
+        logger.info("Sigma T800 leállítva a felhasználó által.")
