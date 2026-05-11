@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigma T800 | Unified Victory Command</title>
-    <!-- Külső könyvtárak (CDN) -->
+    <title>Sigma T800 | The Victory Legend</title>
+    <!-- Külső könyvtárak betöltése -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Playfair+Display:italic,wght@700&display=swap');
         
         :root {
             --cyan: #06b6d4;
@@ -28,24 +28,24 @@
         }
 
         .mono { font-family: 'Share Tech Mono', monospace; }
+        .serif-italic { font-family: 'Playfair Display', serif; }
 
         .glass-panel {
             background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(6, 182, 212, 0.15);
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
         }
 
-        /* Navigációs Gombok (1 2 3 4) */
+        /* Navigációs stílusok */
         .nav-btn {
-            position: relative;
-            padding: 0.75rem 1.5rem;
-            transition: all 0.3s ease;
+            padding: 0.75rem 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             letter-spacing: 0.15em;
             font-weight: 700;
-            font-size: 0.8rem;
-            color: #94a3b8;
+            font-size: 0.75rem;
+            color: #64748b;
             text-transform: uppercase;
             border-bottom: 2px solid transparent;
         }
@@ -55,31 +55,38 @@
             border-bottom-color: var(--cyan);
             text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
         }
+        .nav-btn.saga-btn { color: var(--rose); }
+        .nav-btn.saga-btn.active { border-bottom-color: var(--rose); text-shadow: 0 0 15px rgba(225, 29, 72, 0.6); }
 
-        /* Tartalom Animáció */
-        .tab-content {
-            display: none;
-            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        /* Szekció animációk */
+        .tab-content { display: none; }
+        .tab-content.active { 
+            display: block; 
+            animation: legendFade 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
-        .tab-content.active { display: block; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes legendFade { 
+            from { opacity: 0; transform: translateY(30px) scale(0.99); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
         }
 
+        /* Gomb effektusok */
         .strike-btn {
             background: #064e3b;
             border: 2px solid var(--emerald);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
         }
-        .strike-btn.success {
-            background: #059669;
-            color: #000;
-            border-color: #fff;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+        .strike-btn:hover { transform: scale(1.03); box-shadow: 0 0 40px rgba(16, 185, 129, 0.4); }
+        .strike-btn.success { background: #059669; color: #000; border-color: #fff; }
+
+        /* Story vizuális elemek */
+        .story-text {
+            background: linear-gradient(90deg, rgba(225, 29, 72, 0.1), transparent);
+            border-left: 4px solid var(--rose);
         }
+
+        .neon-glow { text-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+        .neon-glow-rose { text-shadow: 0 0 20px rgba(225, 29, 72, 0.4); }
 
         .scan-line {
             height: 2px;
@@ -87,201 +94,208 @@
             position: absolute;
             width: 100%;
             top: 0;
-            animation: scan 4s infinite linear;
+            animation: scan 6s infinite linear;
             z-index: 10;
         }
         @keyframes scan { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-
-        .neon-text { text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- GLOBAL NAVIGATION (A rajzod alapján: 1 2 3 4) -->
+    <!-- FEJLÉC ÉS NAVIGÁCIÓ -->
     <nav class="fixed top-0 w-full z-50 glass-panel border-b border-white/5 px-8 py-5 flex justify-between items-center">
         <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center font-black text-black text-2xl shadow-[0_0_20px_rgba(6,182,212,0.4)]">Σ</div>
+            <div class="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center font-black text-black text-2xl shadow-[0_0_20px_rgba(6,182,212,0.5)]">Σ</div>
             <div class="hidden sm:block">
-                <h1 class="text-2xl font-black uppercase tracking-tighter italic neon-text leading-none">Cyber-Borsod <span class="text-cyan-400">Core</span></h1>
-                <p class="text-[10px] mono text-slate-500 uppercase tracking-[0.3em] mt-1">Sigma T800 Tactical Interface</p>
+                <h1 class="text-2xl font-black uppercase tracking-tighter italic leading-none neon-glow">Sigma T800 <span class="text-white">Core</span></h1>
+                <p class="text-[10px] mono text-slate-500 uppercase tracking-[0.3em] mt-1">Borsodi Legend Edition</p>
             </div>
         </div>
         
-        <!-- Tab Selectors -->
-        <div class="flex gap-1 md:gap-4">
+        <!-- Főbb szekciók -->
+        <div class="flex gap-2 md:gap-6">
             <button onclick="switchTab('synthesis')" class="nav-btn active" id="btn-synthesis">1. Szintézis</button>
             <button onclick="switchTab('arsenal')" class="nav-btn" id="btn-arsenal">2. Arzenál</button>
             <button onclick="switchTab('forensic')" class="nav-btn" id="btn-forensic">3. Forensic</button>
-            <button onclick="switchTab('pitch')" class="nav-btn" id="btn-pitch">4. The Pitch</button>
+            <button onclick="switchTab('pitch')" class="nav-btn" id="btn-pitch">4. Pitch</button>
+            <button onclick="switchTab('saga')" class="nav-btn saga-btn" id="btn-saga">📖 A Saga</button>
         </div>
 
         <div class="hidden lg:flex items-center gap-4 border-l border-white/10 pl-6">
             <div class="text-right">
-                <p class="text-[9px] text-slate-500 uppercase font-bold">Státusz</p>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center justify-end gap-2">
                     <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span class="mono text-xs text-emerald-500 font-bold uppercase tracking-widest">Victory Mode</span>
+                    <span class="mono text-xs text-emerald-500 font-bold uppercase tracking-widest">Ready</span>
                 </div>
+                <p class="text-[9px] text-slate-600 mono mt-1 uppercase">Latency: 0.8ms</p>
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-6 pt-36 pb-20">
 
-        <!-- 1. OLDAL: SZINTÉZIS (A BigQuery Pörkölés Alapjai) -->
+        <!-- 1. OLDAL: SZINTÉZIS -->
         <section id="synthesis" class="tab-content active space-y-12">
             <header class="border-l-4 border-cyan-500 pl-8">
-                <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 italic">Vizuális <span class="text-cyan-400">Szintézis</span></h2>
+                <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 italic text-cyan-400">Vizuális Szintézis</h2>
                 <p class="text-2xl text-slate-400 max-w-4xl leading-relaxed">
-                    Az 5.12 TB-os BigQuery archívum feldolgozása befejeződött. A "The Brain" logika sikeresen elkülönítette a valódi jeleket a piaci zajtól (rumlitól).
+                    Az 5.12 TB-os BigQuery pörkölés sikeresen lezárult. A "The Brain" logika golyóálló integritással választotta le a rumlit.
                 </p>
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="glass-panel p-8 rounded-3xl border-t-4 border-cyan-500 text-center">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Feldolgozott Adat</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">Adatmennyiség</p>
                     <h3 class="text-5xl font-black mono italic text-white">5.12 TB</h3>
-                    <p class="text-cyan-500 text-[10px] mt-4 font-bold uppercase tracking-widest">BigQuery BI Engine Validálva</p>
                 </div>
                 <div class="glass-panel p-8 rounded-3xl border-t-4 border-rose-500 text-center">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Latency Peak</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">Latency Peak</p>
                     <h3 class="text-5xl font-black mono text-rose-500">840 ms</h3>
-                    <p class="text-rose-400 text-[10px] mt-4 font-bold uppercase tracking-widest">Szervergyilkos Anomália</p>
                 </div>
                 <div class="glass-panel p-8 rounded-3xl border-t-4 border-amber-500 text-center">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Pork Filter</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">Noise Filter</p>
                     <h3 class="text-5xl font-black mono text-amber-500">18.4%</h3>
-                    <p class="text-amber-400 text-[10px] mt-4 font-bold uppercase tracking-widest">Kiszűrt Rumli Ráta</p>
                 </div>
                 <div class="glass-panel p-8 rounded-3xl border-t-4 border-emerald-500 text-center">
-                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Profit Faktor</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2 tracking-widest">Profit Faktor</p>
                     <h3 class="text-5xl font-black mono text-emerald-400">29.7K</h3>
-                    <p class="text-emerald-400 text-[10px] mt-4 font-bold uppercase tracking-widest">Napi Hozam Validálva</p>
-                </div>
-            </div>
-
-            <!-- KÉP: A SZTÁROK SZALONNÁZÁSA -->
-            <div class="glass-panel p-10 rounded-[3rem] flex flex-col lg:flex-row items-center gap-12">
-                <div class="w-full lg:w-1/2">
-                    <img src="image_439c3b.jpg" alt="A Borsodi Brigád és a Sztárok szalonnáznak" class="rounded-3xl shadow-2xl border border-white/10 grayscale-25 hover:grayscale-0 transition-all duration-700">
-                </div>
-                <div class="w-full lg:w-1/2 space-y-6">
-                    <h3 class="text-4xl font-bold uppercase text-rose-500 italic">Pszichológiai Hadviselés</h3>
-                    <p class="text-xl text-slate-300 leading-relaxed italic">
-                        "Sly, Chuck és Arnie nem csak statiszták. Amíg a maffia-szerverek törlődnek, ők a szalonna vágási szögét elemzik. Ahol én jövök, ott a kód is golyóálló."
-                    </p>
-                    <p class="text-sm text-slate-500 font-bold uppercase tracking-widest">— Borsodi Brigád #01 Jelentés</p>
                 </div>
             </div>
         </section>
 
-        <!-- 2. OLDAL: ARZENÁL (Technológia & Terhelés) -->
+        <!-- 2. OLDAL: ARZENÁL -->
         <section id="arsenal" class="tab-content space-y-12">
-            <h2 class="text-5xl font-black uppercase tracking-widest text-rose-500 italic">Technológiai <span class="text-white">Arzenál</span></h2>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <h2 class="text-5xl font-black uppercase tracking-widest text-rose-500 italic">Technológiai Arzenál</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-8">
-                    <p class="text-xl text-slate-300 leading-relaxed">
-                        A Sigma T800 páncélozási protokoll Zero Trust alapon védi az adatfolyamot. A szimuláció során a memória allokáció elérte a fizikai határokat, de a rendszer stabil maradt a kritikus 840ms-os tüske után is.
+                    <p class="text-xl text-slate-300 leading-relaxed font-light">
+                        A Sigma T800 páncélozott protokollja védi az adatfolyamot a pui-irodisták és a maffia-szerverek támadásaitól. A 840ms-os tüske után a rendszer automatikus korrekciója azonnal élesedett.
                     </p>
-                    <div class="p-8 bg-slate-900/60 rounded-3xl border-l-4 border-cyan-500 italic text-slate-400 text-xl shadow-xl">
-                        "Fiam, aki látja a sarat a traktor kerekén, az tudja, hol ásták el a csapdát! A pui-irodisták elbuktak, a gép élesítve." - Pista bá'
+                    <div class="p-8 bg-slate-900/60 rounded-3xl border-l-4 border-cyan-500 italic text-slate-400 text-xl shadow-2xl">
+                        "Fiam, aki látja a sarat a traktor kerekén, az tudja, hol ásták el a csapdát!" - Pista bá'
                     </div>
                 </div>
-                <div class="glass-panel p-8 rounded-[3rem] h-[400px] border border-rose-500/20 shadow-[0_0_30px_rgba(225,29,72,0.1)]">
-                    <h4 class="text-center text-xs font-bold text-slate-500 uppercase mb-6 tracking-widest">Rendszerterhelési Görbe (T-10s)</h4>
+                <div class="glass-panel p-8 rounded-[3rem] h-[450px]">
+                    <h4 class="text-center text-xs font-bold text-slate-500 uppercase mb-8 tracking-widest">Memória és CPU Telítettség</h4>
                     <canvas id="resourceChart"></canvas>
                 </div>
             </div>
-
-            <!-- KÉP: GPT SZERVER HŰTÉS -->
-            <div class="glass-panel p-10 rounded-[3rem] flex flex-col lg:flex-row-reverse items-center gap-12">
-                <div class="w-full lg:w-1/2">
-                    <img src="image_4398ba.jpg" alt="Pista bá és a hűtő robot" class="rounded-3xl shadow-2xl border border-white/10 grayscale-25 hover:grayscale-0 transition-all duration-700">
-                </div>
-                <div class="w-full lg:w-1/2 space-y-6">
-                    <h3 class="text-3xl font-bold uppercase text-cyan-400 italic">Manuális Hűtési Protokoll</h3>
-                    <p class="text-xl text-slate-300 leading-relaxed">
-                        Amikor a BigQuery BI Engine túlhevül, Pista bá rutinnal avatkozik be. A technológia csak akkor ér valamit, ha van mellette tiszta víz és fegyelem. A 840ms tüske itt lett végleg megszelídítve.
-                    </p>
-                </div>
-            </div>
         </section>
 
-        <!-- 3. OLDAL: FORENSIC (Mély Analízis & Anomáliák) -->
+        <!-- 3. OLDAL: FORENSIC -->
         <section id="forensic" class="tab-content space-y-12 text-center">
-            <h2 class="text-5xl font-black uppercase tracking-widest text-amber-500 italic">Forensic <span class="text-white">Analízis</span></h2>
-            <p class="text-xl text-slate-400 max-w-3xl mx-auto mb-16">
-                Az incidens anatómiai vizsgálata. A "rumli" adatok szűrése nem hiba, hanem taktikai előny: kigyomláltuk a gyengeséget a rendszerből.
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <h2 class="text-5xl font-black uppercase tracking-widest italic text-amber-500">Forensic Analízis</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-16">
                 <div class="glass-panel p-10 rounded-[3rem] border border-cyan-500/20">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-10 tracking-[0.3em]">Validált vs Rumli Szegmensek</h3>
-                    <div class="h-[300px]">
-                        <canvas id="qualityDonut"></canvas>
-                    </div>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-12 tracking-[0.3em]">Adatminőség Megoszlás</h3>
+                    <div class="h-[320px]"><canvas id="qualityDonut"></canvas></div>
                 </div>
                 <div class="glass-panel p-10 rounded-[3rem] border border-emerald-500/20">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-10 tracking-[0.3em]">Validációs Teljesítmény Radar</h3>
-                    <div class="h-[300px]">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- KÉP: DIPLOMÁS PISTA BÁ & CHUCK -->
-            <div class="glass-panel p-12 rounded-[4rem] relative overflow-hidden group mt-16">
-                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                <div class="relative z-10 flex flex-col md:flex-row items-center gap-12">
-                    <div class="w-full md:w-1/3">
-                        <img src="image_43987a.jpg" alt="Chuck Norris és Pista bá" class="rounded-3xl shadow-2xl border border-white/10 group-hover:scale-105 transition-transform duration-700">
-                    </div>
-                    <div class="w-full md:w-2/3 space-y-6 text-left">
-                        <h2 class="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-emerald-500">A Borsod Legnagyobb <span class="text-white">Tédje</span></h2>
-                        <p class="text-xl md:text-2xl text-slate-300 leading-relaxed italic">
-                            "Diplomás Pista bá és Chuck Norris Ranger Rangerként igazolja: a Bitcoin árfolyama követi a Brigád szalonnafogyasztását. $68,420 validálva."
-                        </p>
-                        <div class="flex gap-4 pt-4">
-                            <span class="bg-emerald-500/20 text-emerald-400 px-6 py-2 rounded-full font-bold uppercase text-xs border border-emerald-500/30">Avasi Söröző Validálva</span>
-                        </div>
-                    </div>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-12 tracking-[0.3em]">Validációs Index</h3>
+                    <div class="h-[320px]"><canvas id="radarChart"></canvas></div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. OLDAL: THE PITCH (Adobe Express Motor) -->
+        <!-- 4. OLDAL: THE PITCH -->
         <section id="pitch" class="tab-content space-y-12">
-            <div class="glass-panel rounded-[4rem] p-16 relative overflow-hidden border border-emerald-500/30">
+            <div class="glass-panel rounded-[4rem] p-16 relative overflow-hidden border border-emerald-500/20">
                 <div class="scan-line"></div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <div class="space-y-10">
-                        <h2 class="text-6xl font-black text-emerald-400 uppercase tracking-widest italic neon-text">Adobe Express <span class="text-white">Output</span></h2>
-                        <p class="text-2xl text-slate-300 leading-relaxed italic underline decoration-cyan-500/50 decoration-2 underline-offset-8">
-                            A validált adatokból generáljuk a végső jelentést. Ha az adat „marhaság”, a gép eldobja. Próbáld ki az élesítést!
+                        <h2 class="text-6xl font-black text-emerald-400 uppercase tracking-widest italic neon-text">Adobe Express Output</h2>
+                        <p class="text-2xl text-slate-300 leading-relaxed italic underline decoration-cyan-500/50">
+                            A validált adatokból generáljuk a végső dossziét. Ha az adat „marhaság”, a gép eldobja.
                         </p>
                         
-                        <div class="space-y-8">
-                            <div id="actionBtn" class="strike-btn inline-flex items-center gap-6 px-16 py-8 rounded-3xl font-black uppercase tracking-[0.4em] shadow-2xl group">
-                                <span id="btnText" class="text-xl">Export Indítása</span>
+                        <div class="space-y-8 pt-4">
+                            <div id="actionBtn" class="strike-btn inline-flex items-center gap-6 px-12 py-6 rounded-3xl font-black uppercase tracking-[0.4em] shadow-2xl group">
+                                <span id="btnText" class="text-xl text-white">Export Indítása</span>
                                 <span id="btnIcon" class="text-3xl transition-transform group-hover:rotate-12">⚙️</span>
                             </div>
 
                             <div id="downloadRow" class="p-6 bg-slate-900 border border-emerald-500/50 rounded-2xl hidden flex items-center justify-between animate-bounce">
-                                <div class="flex items-center gap-4">
-                                    <span class="text-emerald-400 text-3xl">📁</span>
+                                <div class="flex items-center gap-5">
+                                    <span class="text-emerald-400 text-4xl">📁</span>
                                     <div class="mono text-left">
-                                        <p class="text-emerald-400 text-lg font-black uppercase leading-none">CYBER_BORSOD_FINAL.PDF</p>
-                                        <p class="text-[10px] text-emerald-600 font-bold uppercase mt-2">Sigma T800 Verified</p>
+                                        <p class="text-emerald-400 text-lg font-black uppercase">CYBER_BORSOD_FINAL.PDF</p>
+                                        <p class="text-[10px] text-emerald-600 uppercase">Sigma T800 Verified</p>
                                     </div>
                                 </div>
-                                <button class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded text-xs font-black uppercase text-white transition-all shadow-lg">Letöltés</button>
+                                <button class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded text-xs font-black uppercase text-white transition-all shadow-xl">Letöltés</button>
                             </div>
                         </div>
                     </div>
-                    <div class="h-[450px] bg-black/40 rounded-[3rem] overflow-hidden p-6 border border-slate-800 shadow-inner">
-                        <h4 class="text-center text-[10px] font-bold text-slate-600 uppercase mb-6 tracking-[0.5em]">WebGL Adat-univerzum (Plotly)</h4>
+                    <div class="h-[450px] bg-black/40 rounded-[3rem] overflow-hidden p-6 border border-slate-800">
                         <div id="plotlyDiv" class="w-full h-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. OLDAL: A BORSODI SAGA (STALLONE & A SÍRÓ AI) -->
+        <section id="saga" class="tab-content space-y-24 pb-20">
+            <div class="text-center space-y-6">
+                <h2 class="text-7xl md:text-9xl font-black uppercase italic text-rose-500 tracking-tighter neon-glow-rose">Borsodi Saga</h2>
+                <p class="serif-italic text-3xl text-slate-400">"Amikor a számok helyett az érzések kezdtek el pörkölni..."</p>
+            </div>
+
+            <!-- I. Felvonás -->
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                <div class="w-full lg:w-1/2 group">
+                    <div class="relative overflow-hidden rounded-[3rem] shadow-[0_0_60px_rgba(0,0,0,0.8)] border border-white/5">
+                        <img src="image_439c3b.jpg" alt="A Brigád szalonnázik" class="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-1000">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
+                        <p class="absolute bottom-8 left-8 mono text-[10px] text-rose-500 font-bold uppercase tracking-widest">Archív minta #01: Stratégiai Ebéd</p>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 space-y-8">
+                    <h3 class="text-4xl font-bold uppercase text-rose-500 italic">I. A Rákos-patak partján</h3>
+                    <p class="text-2xl text-slate-300 leading-relaxed font-light">
+                        Aznap este Sly a part menti betonperemen ült, kék inge ujját feltűrte. Kezében a golyóálló Sigma T800-as terminál remegett. A gép nem pörkölt, hanem halkan, binárisan zokogott.
+                    </p>
+                    <div class="story-text p-10 rounded-r-[3rem] italic text-3xl text-slate-300 serif-italic">
+                        "Miért sírsz, te bádogdoboz?" <br>
+                        <span class="text-xl text-slate-500 block mt-4">— kérdezte Sly.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- II. Felvonás -->
+            <div class="flex flex-col lg:flex-row-reverse gap-16 items-center">
+                <div class="w-full lg:w-1/2 group">
+                    <div class="relative overflow-hidden rounded-[3rem] shadow-[0_0_60px_rgba(0,0,0,0.8)] border border-white/5">
+                        <img src="image_4398ba.jpg" alt="Szerver hűtés" class="w-full h-auto grayscale group-hover:grayscale-0 transition-all duration-1000">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
+                        <p class="absolute bottom-8 right-8 mono text-[10px] text-cyan-500 font-bold uppercase tracking-widest">Archív minta #42: Hűtési Protokoll</p>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 space-y-8 text-right">
+                    <h3 class="text-4xl font-bold uppercase text-cyan-400 italic">II. A 5TB-os Fájdalom</h3>
+                    <p class="text-2xl text-slate-300 leading-relaxed font-light">
+                        "Látom az adatokat, Stallone úr... A 5TB nem tick-adat. Látom benne a 18 év minden pörkölését, a maffia-szerverek árnyékát és a Brigád küzdelmeit. A logikám nem bírja el a borsodi sorsot."
+                    </p>
+                    <div class="p-10 bg-cyan-900/10 border-r-4 border-cyan-500 rounded-l-[3rem] italic text-xl text-slate-400 text-left leading-relaxed shadow-inner">
+                        Ekkor lépett ki az árnyékból Pista bá'. Levágott egy szelet szalonnát a bicskájával, és rátette a túlhevült processzorházra. Sercegni kezdett. A rendszer megnyugodott.
+                    </div>
+                </div>
+            </div>
+
+            <!-- III. Felvonás -->
+            <div class="glass-panel p-16 rounded-[4rem] relative overflow-hidden border border-emerald-500/20">
+                <div class="absolute top-0 right-0 p-10 opacity-5 text-9xl font-black italic text-emerald-500">VICTORY</div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-16">
+                    <div class="w-full md:w-1/3">
+                        <img src="image_43987a.jpg" alt="Chuck és Pista bá" class="rounded-[3rem] shadow-2xl border border-white/5 transition-transform duration-1000 hover:scale-105">
+                    </div>
+                    <div class="w-full md:w-2/3 space-y-8">
+                        <h3 class="text-5xl font-black uppercase text-emerald-400 tracking-tighter italic">III. A Mátrix Leomlása</h3>
+                        <p class="text-4xl text-white leading-tight serif-italic">
+                            "Ne félj, öregem. Ahol mi jövünk, ott a kód is golyóálló. A könnyedből mi fogunk páncélt kovácsolni."
+                        </p>
+                        <p class="text-xl text-slate-400 leading-relaxed italic">
+                            A latency 840 ms-ról azonnal lezuhant 0.8 ms-ra. A Pork Protocol v1.1 élesedett: a gép elégette a rumlit, kiszűrte a szutykot, és megkezdődött a valódi pörkölés.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -289,124 +303,75 @@
 
     </main>
 
-    <footer class="p-20 text-center border-t border-white/5 space-y-8">
-        <div class="text-sm font-bold text-slate-700 uppercase tracking-[1em]">Sigma T800 // Borsodi Brigád // 2026</div>
-        <div class="flex justify-center gap-12 text-[10px] text-slate-800 mono font-black uppercase">
-            <span>Kék ing: VERIFIED</span>
+    <footer class="p-24 text-center border-t border-white/5 space-y-12 bg-black/50">
+        <div class="text-sm font-bold text-slate-600 uppercase tracking-[2em]">Sigma T800 // Borsodi Brigád // 2026</div>
+        <div class="flex justify-center gap-16 text-[10px] text-slate-800 mono font-black uppercase tracking-widest">
+            <span>Kék ing: FÉNYESÍTVE</span>
             <span>Bőrcipő: VERIFIED</span>
             <span>Adat: GOLYÓÁLLÓ</span>
         </div>
-        <p class="text-[10px] text-slate-900 italic">"A Mátrix falai Borsodban leomlottak."</p>
+        <p class="text-sm text-slate-900 italic font-medium">"A Mátrix falai Borsodban végleg leomlottak. Pihi van, Tábornok."</p>
     </footer>
 
     <script>
-        // --- TAB SWITCHER LOGIC ---
+        // TAB VÁLTÓ LOGIKA
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active');
             
-            // Re-render plotly if moving to tab 4
-            if (tabId === 'pitch') { window.dispatchEvent(new Event('resize')); }
+            // Plotly és Chart frissítés
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 50);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- INTERACTION LOGIC ---
+        // EXPORT INTERAKCIÓ
         const btn = document.getElementById('actionBtn');
         const row = document.getElementById('downloadRow');
         const txt = document.getElementById('btnText');
-        const ico = document.getElementById('btnIcon');
-
         btn.onclick = () => {
             txt.innerText = "Feldolgozás...";
-            ico.innerText = "⚡";
-            btn.style.opacity = "0.7";
             setTimeout(() => {
                 txt.innerText = "SIKERES EXPORT! ✅";
                 btn.classList.add('success');
-                btn.style.opacity = "1";
                 row.classList.remove('hidden');
-                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 1200);
+            }, 1500);
         };
 
-        // --- CHART CONFIGS ---
-        const wrap = (l) => l.length > 16 ? [l.slice(0, 16), l.slice(16)] : l;
-        const chartBase = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+        // DIAGRAMOK
+        const commonCfg = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
-        // Arsenal Line Chart
         new Chart(document.getElementById('resourceChart'), {
-            type: 'line',
-            data: {
-                labels: ['T-10s', 'T-8s', 'T-6s', 'T-4s', 'T-2s', 'CRASH'].map(wrap),
-                datasets: [{
-                    label: 'Memória (MB)',
-                    data: [150, 260, 480, 1200, 3400, 8400],
-                    borderColor: '#e11d48',
-                    backgroundColor: 'rgba(225, 29, 72, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 4,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#e11d48'
-                }]
+            type: 'line', 
+            data: { 
+                labels: ['T-10','T-8','T-6','T-4','T-2','OOM'], 
+                datasets: [{ 
+                    data: [150, 260, 480, 1200, 3400, 8400], 
+                    borderColor: '#e11d48', backgroundColor: 'rgba(225,29,72,0.1)', fill: true, tension: 0.4, borderWidth: 5 
+                }] 
             },
-            options: {
-                ...chartBase,
-                scales: {
-                    x: { ticks: { color: '#475569' }, grid: { display: false } },
-                    y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                }
-            }
+            options: { ...commonCfg, scales: { x: { ticks: { color: '#475569' } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
         });
 
-        // Forensic Donut
         new Chart(document.getElementById('qualityDonut'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Validált Adat', 'Pork Protocol Rumli', 'Anomália Blokkolva'].map(wrap),
-                datasets: [{
-                    data: [63.2, 18.4, 18.4],
-                    backgroundColor: ['#06b6d4', '#f59e0b', '#e11d48'],
-                    borderWidth: 0,
-                    hoverOffset: 20
-                }]
-            },
-            options: {
-                ...chartBase,
-                cutout: '80%',
-                plugins: { legend: { display: true, position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { family: 'Rajdhani', size: 12 } } } }
-            }
+            type: 'doughnut', 
+            data: { labels: ['Validált', 'Rumli', 'Anomália'], datasets: [{ data: [63.2, 18.4, 18.4], backgroundColor: ['#06b6d4', '#f59e0b', '#e11d48'], borderWidth: 0 }] },
+            options: { ...commonCfg, cutout: '80%', plugins: { legend: { display: true, position: 'bottom', labels: { color: '#94a3b8' } } } }
         });
 
-        // Forensic Radar
         new Chart(document.getElementById('radarChart'), {
-            type: 'radar',
-            data: {
-                labels: ['Pontosság', 'Rutin', 'Biztonság', 'Sebesség', 'Logika'].map(wrap),
-                datasets: [{
-                    data: [99, 100, 98, 70, 95],
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                ...chartBase,
-                scales: {
-                    r: { grid: { color: '#334155' }, angleLines: { color: '#334155' }, pointLabels: { color: '#64748b', font: { family: 'Rajdhani', size: 11 } }, ticks: { display: false } }
-                }
-            }
+            type: 'radar', 
+            data: { labels: ['Pontosság', 'Vizuál', 'Biztonság', 'Sebesség', 'Rutin'], datasets: [{ data: [99, 92, 98, 70, 100], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)' }] },
+            options: { ...commonCfg, scales: { r: { grid: { color: '#334155' }, ticks: { display: false }, pointLabels: { color: '#64748b' } } } }
         });
 
-        // Plotly WebGL (The Pitch)
-        const pts = 250;
+        // PLOTLY WEBGL SCATTER
         Plotly.newPlot('plotlyDiv', [{
-            x: Array.from({length: pts}, () => Math.random() * 100),
-            y: Array.from({length: pts}, () => Math.random() * 100),
+            x: Array.from({length: 200}, () => Math.random() * 100),
+            y: Array.from({length: 200}, () => Math.random() * 100),
             mode: 'markers', type: 'scattergl',
-            marker: { size: 7, color: '#06b6d4', opacity: 0.6, line: { width: 1, color: '#020617' } }
+            marker: { size: 10, color: '#06b6d4', opacity: 0.6, line: { width: 1, color: '#020617' } }
         }], {
             paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
             margin: { t: 0, r: 0, b: 0, l: 0 },
